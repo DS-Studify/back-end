@@ -1,10 +1,10 @@
 package com.yubaba.studify.controller;
 
 import com.yubaba.studify.common.ApiResponse;
+import com.yubaba.studify.common.ResponseCode;
 import com.yubaba.studify.dto.RecordResponse;
 import com.yubaba.studify.service.RecordService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +25,9 @@ public class RecordController {
         RecordResponse dto = recordService.getFeedbackDetail(studyRecordId, tab);
         return ResponseEntity.ok(
                 ApiResponse.<RecordResponse>builder()
-                        .status(200)
-                        .code("SUCCESS_FEEDBACK_DETAIL_FETCHED")
-                        .message("피드백 상세 조회에 성공했습니다.")
+                        .status(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getStatus())
+                        .code(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getCode())
+                        .message(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getMessage())
                         .data(dto)
                         .build()
         );
