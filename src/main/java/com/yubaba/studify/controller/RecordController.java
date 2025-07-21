@@ -34,7 +34,7 @@ public class RecordController {
         );
     }
 
-    @Operation(summary = "피드백 상세 조회", description = "피드백 상세 정보를 recordId와 tab값으로 조회합니다.")
+    @Operation(summary = "공부 분석 결과 조회", description = "공부 분석 결과를 recordId와 tab값으로 조회합니다.")
     @GetMapping("/{studyRecordId}/result")
     public ResponseEntity<ApiResponse<AnalysisResponse>> getAnalysisResult(
             @PathVariable Long studyRecordId,
@@ -43,9 +43,9 @@ public class RecordController {
         AnalysisResponse dto = recordService.getAnalysisResult(studyRecordId, tab);
         return ResponseEntity.ok(
                 ApiResponse.<AnalysisResponse>builder()
-                        .status(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getStatus())
-                        .code(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getCode())
-                        .message(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getMessage())
+                        .status(ResponseCode.SUCCESS_ANALYSIS_RESULT.getStatus())
+                        .code(ResponseCode.SUCCESS_ANALYSIS_RESULT.getCode())
+                        .message(ResponseCode.SUCCESS_ANALYSIS_RESULT.getMessage())
                         .data(dto)
                         .build()
         );
