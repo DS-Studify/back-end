@@ -3,6 +3,7 @@ package com.yubaba.studify.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -14,6 +15,7 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final RedisService redisService;
 
+    @Async
     public void sendAuthCode(String toEmail) {
         String code = createAuthCode();
         redisService.setEmailAuthCode(toEmail, code);
@@ -26,6 +28,7 @@ public class MailService {
         mailSender.send(message);
     }
 
+    @Async
     public void resendAuthCode(String toEmail) {
         String newCode = createAuthCode();
         redisService.replaceEmailAuthCode(toEmail, newCode);
