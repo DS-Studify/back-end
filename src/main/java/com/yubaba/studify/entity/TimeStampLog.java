@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -25,8 +27,8 @@ public class TimeStampLog {
     private StudyState state;
 
     @Column(nullable = true)
-    private String startTime;  // 상태 시작 시간
+    private LocalDateTime startTime;  // 상태 시작 시간
 
     @Column(nullable = true)
-    private String endTime;    // 상태 끝 시간
+    private LocalDateTime endTime;    // 상태 끝 시간
 }
