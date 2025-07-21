@@ -2,20 +2,21 @@ package com.yubaba.studify.controller;
 
 import com.yubaba.studify.common.ApiResponse;
 import com.yubaba.studify.common.ResponseCode;
+import com.yubaba.studify.dto.EmailRequest;
 import com.yubaba.studify.dto.LoginRequest;
 import com.yubaba.studify.dto.LoginResponse;
 import com.yubaba.studify.dto.SignupRequest;
 import com.yubaba.studify.entity.User;
 import com.yubaba.studify.repository.UserRepository;
 import com.yubaba.studify.security.JwtUtil;
+import com.yubaba.studify.service.MailService;
+import com.yubaba.studify.service.RedisService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,6 +26,8 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final MailService mailService;
+    private final RedisService redisService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody SignupRequest singupReq) {
@@ -64,6 +67,48 @@ public class AuthController {
                         .code(ResponseCode.SUCCESS_REGISTER.getCode())
                         .message(ResponseCode.SUCCESS_REGISTER.getMessage())
                         .data(null)
+                        .build()
+        );
+    }
+
+    @PostMapping("/send-verification")
+    public ResponseEntity<ApiResponse<String>> sendEmail(@RequestBody @Valid EmailRequest email) {
+        mailService.sendAuthCode(email.getEmail());
+
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .status(ResponseCode.SUCCESS_EMAIL_SEND.getStatus())
+                        .code(ResponseCode.SUCCESS_EMAIL_SEND.getCode())
+                        .message(ResponseCode.SUCCESS_EMAIL_SEND.getMessage())
+                        .data(email.getEmail())
+                        .build()
+        );
+    }
+
+    @PostMapping("/check-verification")
+    public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String email, @RequestParam String code) {
+
+        String savedCode = redisService.getEmailAuthCode(email);
+
+        if (savedCode != null && savedCode.equals(code)) {
+            redisService.deleteEmailAuthCode(email);
+
+            return ResponseEntity.ok(
+                    ApiResponse.<String>builder()
+                            .status(ResponseCode.SUCCESS_EMAIL_VERIFY.getStatus())
+                            .code(ResponseCode.SUCCESS_EMAIL_VERIFY.getCode())
+                            .message(ResponseCode.SUCCESS_EMAIL_VERIFY.getMessage())
+                            .data(email)
+                            .build()
+            );
+        }
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.<String>builder()
+                        .status(ResponseCode.INVALID_EMAIL_CODE.getStatus())
+                        .code(ResponseCode.INVALID_EMAIL_CODE.getCode())
+                        .message(ResponseCode.INVALID_EMAIL_CODE.getMessage())
+                        .data(email)
                         .build()
         );
     }
