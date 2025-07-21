@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
     List<StudyRecord> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+    List<StudyRecord> findByUserIdAndDate(Long userId, LocalDate date);
 }
