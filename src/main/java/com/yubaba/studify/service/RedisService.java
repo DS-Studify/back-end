@@ -23,4 +23,8 @@ public class RedisService {
     public void deleteEmailAuthCode(String email) {
         redisTemplate.delete(email);
     }
+
+    public void replaceEmailAuthCode(String email, String newCode) {
+        redisTemplate.opsForValue().set(email, newCode, Duration.ofMinutes(5));
+    }
 }

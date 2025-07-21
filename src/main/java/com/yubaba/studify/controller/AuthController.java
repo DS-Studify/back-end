@@ -85,6 +85,20 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/reverify")
+    public ResponseEntity<ApiResponse<String>> resendEmail(@RequestBody @Valid EmailRequest email) {
+        mailService.resendAuthCode(email.getEmail());
+
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .status(ResponseCode.SUCCESS_EMAIL_RESEND.getStatus())
+                        .code(ResponseCode.SUCCESS_EMAIL_RESEND.getCode())
+                        .message(ResponseCode.SUCCESS_EMAIL_RESEND.getMessage())
+                        .data(email.getEmail())
+                        .build()
+        );
+    }
+
     @PostMapping("/check-verification")
     public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String email, @RequestParam String code) {
 

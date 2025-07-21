@@ -26,6 +26,18 @@ public class MailService {
         mailSender.send(message);
     }
 
+    public void resendAuthCode(String toEmail) {
+        String newCode = createAuthCode();
+        redisService.replaceEmailAuthCode(toEmail, newCode);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Studify 이메일 인증 코드");
+        message.setText("인증 코드: " + newCode + "\n5분 내에 입력해주세요.");
+
+        mailSender.send(message);
+    }
+
     private String createAuthCode() {
         return String.format("%06d", new Random().nextInt(999999)); // 6자리 숫자
     }

@@ -7,6 +7,7 @@ public enum ResponseCode {
 
     SUCCESS_REGISTER(200, "SUCCESS_REGISTER", "회원가입을 성공했습니다."),
     SUCCESS_EMAIL_SEND(200, "SUCCESS_EMAIL_SEND", "인증 코드가 이메일로 전송되었습니다."),
+    SUCCESS_EMAIL_RESEND(200, "SUCCESS_EMAIL_RESEND", "인증 코드를 재전송했습니다."),
     SUCCESS_EMAIL_VERIFY(200, "SUCCESS_EMAIL_VERIFY", "이메일 인증에 성공했습니다."),
     INVALID_EMAIL_FORMAT(400, "INVALID_EMAIL_FORMAT", "이메일 형식이 유효하지 않습니다."),
     INVALID_EMAIL_CODE(400, "INVALID_EMAIL_CODE", "인증 코드가 일치하지 않거나 만료되었습니다."),
