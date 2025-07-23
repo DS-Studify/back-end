@@ -5,7 +5,7 @@ import com.yubaba.studify.common.ResponseCode;
 import com.yubaba.studify.dto.ChangeNicknameRequest;
 import com.yubaba.studify.dto.ChangePasswordRequest;
 import com.yubaba.studify.dto.ProfileResponse;
-import com.yubaba.studify.service.UserServiceImpl;
+import com.yubaba.studify.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @Operation(summary = "프로필 조회", description = "사용자 프로필을 조회합니다.")
     @GetMapping("/profile")
