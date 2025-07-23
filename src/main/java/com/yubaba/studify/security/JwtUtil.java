@@ -26,11 +26,16 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            System.out.println("JWT 파싱 실패: " + token);
+            throw e;
+        }
     }
 
     public boolean validateToken(String token) {
@@ -38,6 +43,7 @@ public class JwtUtil {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("JWT 오류: " + e.getMessage());
             return false;
         }
     }

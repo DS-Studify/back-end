@@ -2,15 +2,14 @@ package com.yubaba.studify.controller;
 
 import com.yubaba.studify.common.ApiResponse;
 import com.yubaba.studify.common.ResponseCode;
-import com.yubaba.studify.dto.EmailRequest;
-import com.yubaba.studify.dto.LoginRequest;
-import com.yubaba.studify.dto.LoginResponse;
-import com.yubaba.studify.dto.SignupRequest;
+import com.yubaba.studify.dto.*;
 import com.yubaba.studify.entity.User;
 import com.yubaba.studify.repository.UserRepository;
 import com.yubaba.studify.security.JwtUtil;
 import com.yubaba.studify.service.MailService;
 import com.yubaba.studify.service.RedisService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
