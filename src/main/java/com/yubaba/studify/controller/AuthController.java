@@ -41,16 +41,16 @@ public class AuthController {
             );
         }
 
-        if (userRepository.existsByNickname(singupReq.getNickname())) {
-            return ResponseEntity.badRequest().body(
-                    ApiResponse.<Void>builder()
-                            .status(ResponseCode.DUPLICATE_NICKNAME.getStatus())
-                            .code(ResponseCode.DUPLICATE_NICKNAME.getCode())
-                            .message(ResponseCode.DUPLICATE_NICKNAME.getMessage())
-                            .data(null)
-                            .build()
-            );
-        }
+//        if (userRepository.existsByNickname(singupReq.getNickname())) {
+//            return ResponseEntity.badRequest().body(
+//                    ApiResponse.<Void>builder()
+//                            .status(ResponseCode.DUPLICATE_NICKNAME.getStatus())
+//                            .code(ResponseCode.DUPLICATE_NICKNAME.getCode())
+//                            .message(ResponseCode.DUPLICATE_NICKNAME.getMessage())
+//                            .data(null)
+//                            .build()
+//            );
+//        }
 
         User user = User.builder()
                 .email(singupReq.getEmail())

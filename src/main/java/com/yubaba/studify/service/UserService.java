@@ -2,21 +2,13 @@ package com.yubaba.studify.service;
 
 import com.yubaba.studify.dto.ProfileResponse;
 import com.yubaba.studify.entity.User;
-import com.yubaba.studify.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
+public interface UserService {
 
-    private final UserRepository userRepository;
+    ProfileResponse getProfile(String email);
 
-    public ProfileResponse getProfile(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+    void changePassword(String email, String originPassword, String newPassword);
 
-        return new ProfileResponse(user.getEmail(), user.getNickname());
-    }
+    ProfileResponse changeNickname(String email, String newNickname);
 
 }
