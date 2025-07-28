@@ -9,8 +9,10 @@ import com.yubaba.studify.repository.TimeStampLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -171,6 +173,64 @@ public class RecordServiceImpl implements RecordService {
                 .aiFeedback(record.getFeedback())
                 .build();
     }
+
+    @Override
+    public void saveLogs(Long userId, SaveRecordRequest request) {
+        // 시간 계산
+        int recordTime = (int) Duration.between(request.getStartTime(), request.getEndTime()).getSeconds();
+        int studyTime = 0, focusTime = 0, nfocusTime = 0, poseTime = 0,
+                nposeTime = 0, sleepTime = 0, awayTime = 0, etcTime = 0;
+
+        List<TimeStampLog> logs = new ArrayList<>();
+
+        for (Map.Entry<Integer, List<RecordTimeLog>> entry : request.getTimeLog().entrySet()) {
+            int stateCode = entry.getKey();
+            StudyState state = StudyState.values()[stateCode - 1];
+            for (RecordTimeLog period : entry.getValue()) {
+                int duration = (int) Duration.between(period.getStartTime(), period.getEndTime()).getSeconds();
+
+                switch (state) {
+                    case STUDYING -> studyTime += duration;
+                    case GOOD_POSE -> poseTime += duration;
+                    case NFOCUS_POSE -> nfocusTime += duration;
+                    case SLEEP_POSE -> sleepTime += duration;
+                    case AWAY -> awayTime += duration;
+                    case ETC -> etcTime += duration;
+                }
+
+                logs.add(TimeStampLog.builder()
+                        .state(state)
+                        .startTime(period.getStartTime())
+                        .endTime(period.getEndTime())
+                        .build());
+            }
+        }
+
+        nposeTime = nfocusTime + sleepTime;
+
+        StudyRecord record = StudyRecord.builder()
+                .userId(userId)
+                .date(request.getDate())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .recordTime(recordTime)
+                .studyTime(studyTime)
+                .focusTime(poseTime)
+                .nfocusTime(nfocusTime)
+                .poseTime(poseTime)
+                .nposeTime(nposeTime)
+                .sleepTime(sleepTime)
+                .awayTime(awayTime)
+                .etcTime(etcTime)
+                .feedback("AI 피드백") // 추후 분석 모듈 연동
+                .timeStampLogs(new ArrayList<>())
+                .build();
+
+        logs.forEach(log -> log.setStudyRecord(record));
+        record.getTimeStampLogs().addAll(logs);
+        studyRecordRepository.save(record);
+    }
+
 
     private int getStateCode(StudyState state) {
         return switch (state) {
