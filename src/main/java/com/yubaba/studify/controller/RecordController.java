@@ -4,16 +4,13 @@ import com.yubaba.studify.common.ApiResponse;
 import com.yubaba.studify.common.ResponseCode;
 import com.yubaba.studify.dto.AnalysisResponse;
 import com.yubaba.studify.dto.RecordResponse;
-import com.yubaba.studify.dto.RecordTimeLog;
 import com.yubaba.studify.dto.SaveRecordRequest;
 import com.yubaba.studify.service.RecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/record")
@@ -58,14 +55,13 @@ public class RecordController {
 
     @Operation(summary = "공부 기록 저장", description = "공부 로그를 저장합니다.")
     @PostMapping("")
-    public ResponseEntity<ApiResponse<Void>> saveRecord(@RequestBody SaveRecordRequest request) {
-        Long userId = 2L;
-        recordService.saveLogs(userId, request);
+    public ResponseEntity<ApiResponse<Void>> saveRecord(@AuthenticationPrincipal String email, @RequestBody SaveRecordRequest request) {
+        recordService.saveLogs(email, request);
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
-                        .status(ResponseCode.SUCCESS_ANALYSIS_RESULT.getStatus())
-                        .code(ResponseCode.SUCCESS_ANALYSIS_RESULT.getCode())
-                        .message(ResponseCode.SUCCESS_ANALYSIS_RESULT.getMessage())
+                        .status(ResponseCode.SUCCESS_SAVE_RECORD.getStatus())
+                        .code(ResponseCode.SUCCESS_SAVE_RECORD.getCode())
+                        .message(ResponseCode.SUCCESS_SAVE_RECORD.getMessage())
                         .build()
         );
     }
