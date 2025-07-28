@@ -4,8 +4,10 @@ import com.yubaba.studify.dto.*;
 import com.yubaba.studify.entity.StudyRecord;
 import com.yubaba.studify.entity.StudyState;
 import com.yubaba.studify.entity.TimeStampLog;
+import com.yubaba.studify.entity.User;
 import com.yubaba.studify.repository.StudyRecordRepository;
 import com.yubaba.studify.repository.TimeStampLogRepository;
+import com.yubaba.studify.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class RecordServiceImpl implements RecordService {
     private final StudyRecordRepository studyRecordRepository;
     private final TimeStampLogRepository timeStampLogRepository;
+    private final UserRepository userRepository;
 
     @Override
     public RecordResponse getFeedbackDetail(Long recordId, String tab) {
@@ -175,7 +178,9 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public void saveLogs(Long userId, SaveRecordRequest request) {
+    public void saveLogs(String email, SaveRecordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
         // 시간 계산
         int recordTime = (int) Duration.between(request.getStartTime(), request.getEndTime()).getSeconds();
         int studyTime = 0, focusTime = 0, nfocusTime = 0, poseTime = 0,
@@ -209,7 +214,7 @@ public class RecordServiceImpl implements RecordService {
         nposeTime = nfocusTime + sleepTime;
 
         StudyRecord record = StudyRecord.builder()
-                .userId(userId)
+                .userId(user.getId())
                 .date(request.getDate())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())

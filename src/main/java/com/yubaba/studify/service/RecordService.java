@@ -11,5 +11,5 @@ import java.util.Map;
 public interface RecordService {
     RecordResponse getFeedbackDetail(Long recordId, String tab);
     AnalysisResponse getAnalysisResult(Long recordId, String tab);
-    void saveLogs(Long userId, SaveRecordRequest request);
+    void saveLogs(String email, SaveRecordRequest request);
 }

@@ -6,7 +6,9 @@ import com.yubaba.studify.dto.DailyDetail;
 import com.yubaba.studify.dto.TimeRange;
 import com.yubaba.studify.entity.StudyRecord;
 import com.yubaba.studify.entity.StudyState;
+import com.yubaba.studify.entity.User;
 import com.yubaba.studify.repository.StudyRecordRepository;
+import com.yubaba.studify.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +22,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService{
     private final StudyRecordRepository studyRecordRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public CalendarResponse getCalendarData(Long userId, LocalDate date) {
+    public CalendarResponse getCalendarData(String email, LocalDate date) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        Long userId = user.getId();
+
         YearMonth yearMonth = YearMonth.from(date);
 
         // 월간 전체 StudyRecord

@@ -5,5 +5,5 @@ import com.yubaba.studify.dto.CalendarResponse;
 import java.time.LocalDate;
 
 public interface StatisticsService {
-    CalendarResponse getCalendarData(Long userId, LocalDate date);
+    CalendarResponse getCalendarData(String email, LocalDate date);
 }
