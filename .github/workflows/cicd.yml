@@ -28,11 +28,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set environment values
+      - name: Create application.yml from Secrets
         run: |
-          cd ./src/main/resources # resources 폴더로 이동
-          touch ./env.properties # env.properties 파일 생성
-          echo "${{ secrets.ENV_VARS }}" > ./env.properties
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
         shell: bash
 
       - name: Gradlew auth setting
