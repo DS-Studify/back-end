@@ -16,11 +16,12 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(String email) {
+    // 액세스/리프레시 토큰 생성
+    public String generateToken(String email, long expireMillis) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
+                .setExpiration(new Date(System.currentTimeMillis() + expireMillis))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }

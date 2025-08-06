@@ -3,6 +3,7 @@ package com.yubaba.studify.controller;
 import com.yubaba.studify.common.ApiResponse;
 import com.yubaba.studify.common.ResponseCode;
 import com.yubaba.studify.dto.*;
+import com.yubaba.studify.security.JwtUtil;
 import com.yubaba.studify.service.AuthService;
 import com.yubaba.studify.service.MailService;
 import com.yubaba.studify.service.RedisService;
@@ -21,6 +22,7 @@ public class AuthController {
     private final AuthService authService;
     private final MailService mailService;
     private final RedisService redisService;
+    private final JwtUtil jwtUtil;
 
     @Operation(summary = "회원가입")
     @PostMapping("/register")
@@ -75,6 +77,31 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(ResponseCode.INVALID_CREDENTIALS));
         }
+    }
+
+    @Operation(summary = "토큰 재발급")
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody TokenRefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        if (!jwtUtil.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(ResponseCode.INVALID_REFRESH_TOKEN));
+        }
+
+        String email = jwtUtil.extractEmail(refreshToken);
+        String savedToken = redisService.getRefreshToken(email);
+
+        if (savedToken == null || !savedToken.equals(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(ResponseCode.INVALID_REFRESH_TOKEN));
+        }
+
+        String newAccessToken = jwtUtil.generateToken(email, 1000 * 60 * 60);
+        return ResponseEntity.ok(ApiResponse.success(
+                ResponseCode.SUCCESS_TOKEN_REFRESH,
+                new LoginResponse(newAccessToken, refreshToken)
+        ));
     }
 
 }
