@@ -15,6 +15,8 @@ public enum ResponseCode {
     DUPLICATE_EMAIL(400, "DUPLICATE_EMAIL", "이미 존재하는 이메일입니다."),
 //    DUPLICATE_NICKNAME(400, "DUPLICATE_NICKNAME", "이미 존재하는 닉네임입니다."),
     INVALID_CREDENTIALS(401, "INVALID_CREDENTIALS", "이메일 또는 비밀번호가 올바르지 않습니다."),
+    INVALID_REFRESH_TOKEN(401, "INVALID_REFRESH_TOKEN", "Refresh Token이 유효하지 않거나 만료되었습니다."),
+    SUCCESS_TOKEN_REFRESH(200, "SUCCESS_TOKEN_REFRESH", "Access Token이 재발급되었습니다."),
 
     SUCCESS_PROFILE(200, "SUCCESS_PROFILE", "프로필 조회에 성공했습니다."),
     SUCCESS_CHANGE_PASSWORD(200, "SUCCESS_CHANGE_PASSWORD", "비밀번호를 변경했습니다."),
