@@ -15,6 +15,8 @@ import java.util.Map;
 public class AnalysisResponse {
     private Long studyRecordId;
     private String studyDate;
+    private String startTime;
+    private String endTime;
     private String recordTime;
     private int recordRatio;
     private String actualStudyTime;

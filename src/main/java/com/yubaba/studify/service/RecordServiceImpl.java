@@ -169,6 +169,8 @@ public class RecordServiceImpl implements RecordService {
         return AnalysisResponse.builder()
                 .studyRecordId(record.getId())
                 .studyDate(formatKoreanDate(record.getDate()))
+                .startTime(String.valueOf(record.getStartTime()))
+                .endTime(String.valueOf(record.getEndTime()))
                 .recordTime(String.valueOf(record.getRecordTime()))
                 .recordRatio(recordRatio)
                 .actualStudyTime(String.valueOf(record.getStudyTime()))
