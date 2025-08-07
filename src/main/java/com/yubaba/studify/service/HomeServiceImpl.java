@@ -18,10 +18,10 @@ public class HomeServiceImpl implements HomeService{
     private final StudyRecordRepository studyRecordRepository;
 
     @Override
-    public HomeResponse getHomeData(Long userId, LocalDate today) {
-        // 닉네임 가져오기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    public HomeResponse getHomeData(String email, LocalDate today) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        Long userId = user.getId();
 
         // 오늘 날짜의 studyTime 합산
         List<StudyRecord> todayRecords = studyRecordRepository.findByUserIdAndDate(userId, today);

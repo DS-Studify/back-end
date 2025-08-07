@@ -5,5 +5,5 @@ import com.yubaba.studify.dto.HomeResponse;
 import java.time.LocalDate;
 
 public interface HomeService {
-    HomeResponse getHomeData(Long userId, LocalDate today);
+    HomeResponse getHomeData(String email, LocalDate today);
 }
