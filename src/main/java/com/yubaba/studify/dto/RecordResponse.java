@@ -15,6 +15,8 @@ import java.util.Map;
 public class RecordResponse {
     private Long studyRecordId;
     private String studyDate;
+    private String startTime;
+    private String endTime;
     private String actualStudyTime;
     private String tab;
     private PieChart pieChartRatio;

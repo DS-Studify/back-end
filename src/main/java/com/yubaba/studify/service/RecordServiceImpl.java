@@ -92,6 +92,8 @@ public class RecordServiceImpl implements RecordService {
         return RecordResponse.builder()
                 .studyRecordId(record.getId())
                 .studyDate(formatKoreanDate(record.getDate()))
+                .startTime(String.valueOf(record.getStartTime()))
+                .endTime(String.valueOf(record.getEndTime()))
                 .actualStudyTime(String.valueOf(record.getStudyTime()))
                 .tab(tab)
                 .pieChartRatio(pieChart)
