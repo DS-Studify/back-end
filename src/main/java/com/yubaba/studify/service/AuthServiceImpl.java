@@ -43,8 +43,12 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("INVALID_CREDENTIALS");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
-        return new LoginResponse(token);
+        String accessToken = jwtUtil.generateToken(user.getEmail(), 1000*10*60*60); // 1시간
+        String refreshToken = jwtUtil.generateToken(user.getEmail(), 1000L*60*60*24*14); // 2주
+
+        redisService.setRefreshToken(user.getEmail(), refreshToken, 60*60*24*14);
+
+        return new LoginResponse(accessToken, refreshToken);
     }
 
     @Override
