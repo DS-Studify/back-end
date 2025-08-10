@@ -6,6 +6,8 @@ import com.yubaba.studify.dto.SignupRequest;
 
 public interface AuthService {
     void register(SignupRequest request);
-    LoginResponse login(LoginRequest request);
     void verifyEmail(String email, String code);
+    LoginResponse login(LoginRequest request);
+    LoginResponse refreshToken(String refreshToken);
+    void logout(String refreshToken);
 }

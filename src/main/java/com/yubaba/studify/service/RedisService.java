@@ -13,7 +13,6 @@ public class RedisService {
     private final StringRedisTemplate redisTemplate;
 
     // 이메일 인증
-
     public void setEmailAuthCode(String email, String code) {
         redisTemplate.opsForValue().set(email, code, Duration.ofMinutes(5)); // TTL 5분
     }
@@ -30,7 +29,20 @@ public class RedisService {
         redisTemplate.opsForValue().set(email, newCode, Duration.ofMinutes(5));
     }
 
-    // 토큰 재발급
+    // 이메일 인증 완료 상태 관리
+    public void setValue(String key, String value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
+    public String getValue(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public void deleteValue(String key) {
+        redisTemplate.delete(key);
+    }
+
+    // refresh Token 관리
     public void setRefreshToken(String email, String refreshToken, long expireSeconds) {
         redisTemplate.opsForValue().set("refresh:" + email, refreshToken, Duration.ofSeconds(expireSeconds));
     }
