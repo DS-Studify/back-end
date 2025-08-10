@@ -31,6 +31,9 @@ public class AuthController {
             authService.register(singupReq);
             return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_REGISTER, null));
         } catch (IllegalArgumentException e) {
+            if ("EMAIL_NOT_VERIFIED".equals(e.getMessage())) {
+                return ResponseEntity.badRequest().body(ApiResponse.error(ResponseCode.EMAIL_NOT_VERIFIED));
+            }
             return ResponseEntity.badRequest().body(ApiResponse.error(ResponseCode.DUPLICATE_EMAIL));
         }
 
@@ -44,7 +47,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_EMAIL_SEND, email.getEmail()));
     }
 
-    @Operation(summary = "이매일 재인증", description = "이메일 인증 메일을 재전송합니다.")
+    @Operation(summary = "이메일 재인증", description = "이메일 인증 메일을 재전송합니다.")
     @PostMapping("/reverify")
     public ResponseEntity<ApiResponse<String>> resendEmail(@RequestBody @Valid EmailRequest email) {
         mailService.resendAuthCode(email.getEmail());
@@ -59,7 +62,11 @@ public class AuthController {
         String savedCode = redisService.getEmailAuthCode(email);
 
         if (savedCode != null && savedCode.equals(code)) {
+            // 인증 코드 삭제
             redisService.deleteEmailAuthCode(email);
+
+            // 인증 성공 플래그 저장
+            redisService.setValue("verified:" + email, "true");
 
             return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_EMAIL_VERIFY, email));
         }
@@ -79,29 +86,28 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "토큰 재발급")
+    @Operation(summary = "토큰 재발급", description = "토큰 만료 시 토큰을 재발급합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody TokenRefreshRequest request) {
-        String refreshToken = request.getRefreshToken();
-
-        if (!jwtUtil.validateToken(refreshToken)) {
+        try {
+            LoginResponse response = authService.refreshToken(request.getRefreshToken());
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_TOKEN_REFRESH, response));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(ResponseCode.INVALID_REFRESH_TOKEN));
         }
+    }
 
-        String email = jwtUtil.extractEmail(refreshToken);
-        String savedToken = redisService.getRefreshToken(email);
-
-        if (savedToken == null || !savedToken.equals(refreshToken)) {
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestBody LogoutRequest request) {
+        try {
+            authService.logout(request.getRefreshToken());
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_LOGOUT, null));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(ResponseCode.INVALID_REFRESH_TOKEN));
         }
-
-        String newAccessToken = jwtUtil.generateToken(email, 1000 * 60 * 60);
-        return ResponseEntity.ok(ApiResponse.success(
-                ResponseCode.SUCCESS_TOKEN_REFRESH,
-                new LoginResponse(newAccessToken, refreshToken)
-        ));
     }
 
 }

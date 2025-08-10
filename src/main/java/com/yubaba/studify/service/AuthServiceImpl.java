@@ -25,6 +25,13 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("DUPLICATE_EMAIL");
         }
 
+        // 이메일 인증 여부 확인
+        String emailAuthKey = "verified:" + request.getEmail();
+        String verified = redisService.getValue(emailAuthKey);
+        if (verified == null || !verified.equals("true")) {
+            throw new IllegalArgumentException("EMAIL_NOT_VERIFIED");
+        }
+
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -32,6 +39,18 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+
+        // 가입 완료 후 인증 상태 제거
+        redisService.deleteValue(emailAuthKey);
+    }
+
+    @Override
+    public void verifyEmail(String email, String code) {
+        String saved = redisService.getEmailAuthCode(email);
+        if (saved == null || !saved.equals(code)) {
+            throw new IllegalArgumentException("INVALID_EMAIL_CODE");
+        }
+        redisService.deleteEmailAuthCode(email);
     }
 
     @Override
@@ -52,12 +71,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verifyEmail(String email, String code) {
-        String saved = redisService.getEmailAuthCode(email);
-        if (saved == null || !saved.equals(code)) {
-            throw new IllegalArgumentException("INVALID_EMAIL_CODE");
+    public LoginResponse refreshToken(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("INVALID_REFRESH_TOKEN");
         }
-        redisService.deleteEmailAuthCode(email);
+
+        String email = jwtUtil.extractEmail(refreshToken);
+        String savedToken = redisService.getRefreshToken(email);
+
+        if (savedToken == null || !savedToken.equals(refreshToken)) {
+            throw new IllegalArgumentException("INVALID_REFRESH_TOKEN");
+        }
+
+        String newAccessToken = jwtUtil.generateToken(email, 1000 * 60 * 60);
+        return new LoginResponse(newAccessToken, refreshToken);
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("INVALID_REFRESH_TOKEN");
+        }
+
+        String email = jwtUtil.extractEmail(refreshToken);
+        redisService.deleteRefreshToken(email);
     }
 
 }
