@@ -29,7 +29,10 @@ public enum ResponseCode {
     SUCCESS_SAVE_RECORD(200, "SUCCES_SAVE_RECORD", "공부 기록 저장에 성공했습니다."),
     SUCCESS_ANALYSIS_RESULT(200, "SUCCESS_ANALYSIS_RESULT", "공부 분석 결과 조회에 성공했습니다."),
     SUCCESS_FEEDBACK_DETAIL(200, "SUCCESS_FEEDBACK_DETAIL", "피드백 상세 조회에 성공했습니다."),
-    SUCCESS_STATISTICS_CALENDAR(200, "SUCCESS_STATISTICS_CALENDAR", "통계 달력 조회에 성공했습니다.");
+    SUCCESS_STATISTICS_CALENDAR(200, "SUCCESS_STATISTICS_CALENDAR", "통계 달력 조회에 성공했습니다."),
+
+    SUCCESS_FEEDBACK_GENERATED(200, "FEEDBACK_GENERATION_SUCCESS", "AI 피드백 생성에 성공했습니다."),
+    FAIL_FEEDBACK_GENERATED(500, "FEEDBACK_GENERATION_FAILED", "AI 피드백 생성 중 오류가 발생했습니다.");
 
     private final int status;
     private final String code;
