@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ChatGptService {
+
+    private final ObjectMapper mapper;
 
     @Value("${openai.api.key}")
     private String apiKey;
@@ -24,6 +27,7 @@ public class ChatGptService {
     public String getChatResponse(String userMessage) throws Exception {
         OkHttpClient client = new OkHttpClient();
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
         // JSON 생성
         ObjectNode requestJson = mapper.createObjectNode();
@@ -55,10 +59,9 @@ public class ChatGptService {
 
     public String getFeedback(JsonNode studyResult) throws Exception {
         OkHttpClient client = new OkHttpClient();
-        ObjectMapper mapper = new ObjectMapper();
 
-        // data만 추출
-        JsonNode dataNode = studyResult.has("data") ? studyResult.get("data") : studyResult;
+        // 요청값 그대로 문자열 변환
+        String dataString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(studyResult);
 
         String prompt = """
             다음은 한 학생의 공부 상태별 시간 기록입니다.
@@ -74,10 +77,10 @@ public class ChatGptService {
             분석 데이터:
             %s
     
-            이 데이터를 분석해서 학생의 학습 태도와 집중 상태를 평가하고,
+            이 데이터를 분석해서 시간과도 관련지어 학생의 학습 태도와 집중 상태를 평가하고,
             개선할 수 있는 구체적인 조언을 5줄 이내로 문장으로 작성하세요.
             시간은 총 초로 언급하지 않고 시간/분/초 단위로 바꿔서 말하세요.
-        """.formatted(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataNode));
+        """.formatted(dataString);
 
         // 요청 JSON 생성
         ObjectNode requestJson = mapper.createObjectNode();
