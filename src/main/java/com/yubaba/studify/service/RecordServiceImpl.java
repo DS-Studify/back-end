@@ -1,5 +1,7 @@
 package com.yubaba.studify.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubaba.studify.dto.*;
 import com.yubaba.studify.entity.StudyRecord;
 import com.yubaba.studify.entity.StudyState;
@@ -26,6 +28,8 @@ public class RecordServiceImpl implements RecordService {
     private final StudyRecordRepository studyRecordRepository;
     private final TimeStampLogRepository timeStampLogRepository;
     private final UserRepository userRepository;
+    private final ChatGptService chatGptService;
+    private final ObjectMapper mapper;
 
     @Override
     public RecordResponse getFeedbackDetail(Long recordId, String tab) {
@@ -217,6 +221,27 @@ public class RecordServiceImpl implements RecordService {
 
         nposeTime = nfocusTime + sleepTime;
 
+
+        // AI 피드백 요청 데이터 구성: timeLog 형태
+        Map<String, List<RecordTimeLog>> timeLogMap = logs.stream()
+                .collect(Collectors.groupingBy(
+                        log -> String.valueOf(getStateCode(log.getState())),
+                        Collectors.mapping(
+                                log -> new RecordTimeLog(log.getStartTime(), log.getEndTime()),
+                                Collectors.toList()
+                        )
+                ));
+
+        String aiFeedback;
+        try {
+            // timeLogMap을 JSON으로 변환해서 전달
+            JsonNode timeLogJson = mapper.valueToTree(timeLogMap);
+            aiFeedback = chatGptService.getFeedback(timeLogJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+            aiFeedback = "AI 피드백 생성 중 오류가 발생했습니다.";
+        }
+
         StudyRecord record = StudyRecord.builder()
                 .userId(user.getId())
                 .date(request.getDate())
@@ -231,7 +256,7 @@ public class RecordServiceImpl implements RecordService {
                 .sleepTime(sleepTime)
                 .awayTime(awayTime)
                 .etcTime(etcTime)
-                .feedback("AI 피드백") // 추후 분석 모듈 연동
+                .feedback(aiFeedback)
                 .timeStampLogs(new ArrayList<>())
                 .build();
 
