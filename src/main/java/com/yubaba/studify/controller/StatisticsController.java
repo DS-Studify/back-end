@@ -28,12 +28,7 @@ public class StatisticsController {
     ) {
         CalendarResponse dto = statisticsService.getCalendarData(email, date);
         return ResponseEntity.ok(
-                ApiResponse.<CalendarResponse>builder()
-                        .status(ResponseCode.SUCCESS_STATISTICS_CALENDAR.getStatus())
-                        .code(ResponseCode.SUCCESS_STATISTICS_CALENDAR.getCode())
-                        .message(ResponseCode.SUCCESS_STATISTICS_CALENDAR.getMessage())
-                        .data(dto)
-                        .build()
+                ApiResponse.success(ResponseCode.SUCCESS_STATISTICS_CALENDAR, dto)
         );
     }
 }
