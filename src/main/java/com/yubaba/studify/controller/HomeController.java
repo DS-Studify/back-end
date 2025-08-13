@@ -24,12 +24,7 @@ public class HomeController {
         LocalDate today = LocalDate.now();
         HomeResponse dto = homeService.getHomeData(email, today);
         return ResponseEntity.ok(
-                ApiResponse.<HomeResponse>builder()
-                        .status(ResponseCode.SUCCESS_HOME.getStatus())
-                        .code(ResponseCode.SUCCESS_HOME.getCode())
-                        .message(ResponseCode.SUCCESS_HOME.getMessage())
-                        .data(dto)
-                        .build()
+                ApiResponse.success(ResponseCode.SUCCESS_HOME, dto)
         );
     }
 }

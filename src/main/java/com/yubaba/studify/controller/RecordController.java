@@ -27,12 +27,7 @@ public class RecordController {
     ) {
         RecordResponse dto = recordService.getFeedbackDetail(studyRecordId, tab);
         return ResponseEntity.ok(
-                ApiResponse.<RecordResponse>builder()
-                        .status(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getStatus())
-                        .code(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getCode())
-                        .message(ResponseCode.SUCCESS_FEEDBACK_DETAIL.getMessage())
-                        .data(dto)
-                        .build()
+                ApiResponse.success(ResponseCode.SUCCESS_FEEDBACK_DETAIL, dto)
         );
     }
 
@@ -44,12 +39,7 @@ public class RecordController {
     ) {
         AnalysisResponse dto = recordService.getAnalysisResult(studyRecordId, tab);
         return ResponseEntity.ok(
-                ApiResponse.<AnalysisResponse>builder()
-                        .status(ResponseCode.SUCCESS_ANALYSIS_RESULT.getStatus())
-                        .code(ResponseCode.SUCCESS_ANALYSIS_RESULT.getCode())
-                        .message(ResponseCode.SUCCESS_ANALYSIS_RESULT.getMessage())
-                        .data(dto)
-                        .build()
+                ApiResponse.success(ResponseCode.SUCCESS_ANALYSIS_RESULT, dto)
         );
     }
 
@@ -58,11 +48,7 @@ public class RecordController {
     public ResponseEntity<ApiResponse<Void>> saveRecord(@AuthenticationPrincipal String email, @RequestBody SaveRecordRequest request) {
         recordService.saveLogs(email, request);
         return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .status(ResponseCode.SUCCESS_SAVE_RECORD.getStatus())
-                        .code(ResponseCode.SUCCESS_SAVE_RECORD.getCode())
-                        .message(ResponseCode.SUCCESS_SAVE_RECORD.getMessage())
-                        .build()
+                ApiResponse.success(ResponseCode.SUCCESS_SAVE_RECORD, null)
         );
     }
 }
