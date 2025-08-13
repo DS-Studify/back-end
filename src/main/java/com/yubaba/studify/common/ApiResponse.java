@@ -18,7 +18,7 @@ public class ApiResponse<T> {
                 .status(code.getStatus())
                 .code(code.getCode())
                 .message(code.getMessage())
-                .data(data)
+                .data(data != null ? data : (T) "")
                 .build();
     }
 
