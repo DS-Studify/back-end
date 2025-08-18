@@ -46,14 +46,14 @@ public class RecordController {
 
     @Operation(summary = "공부 기록 저장", description = "공부 로그를 저장합니다.")
     @PostMapping("")
-    public ResponseEntity<ApiResponse<Void>> saveRecord(@AuthenticationPrincipal String email, @RequestBody SaveRecordRequest request) {
-        recordService.saveLogs(email, request);
+    public ResponseEntity<ApiResponse<Long>> saveRecord(@AuthenticationPrincipal String email, @RequestBody SaveRecordRequest request) {
+        Long studyRecordId = recordService.saveLogs(email, request);
         return ResponseEntity.ok(
-                ApiResponse.success(ResponseCode.SUCCESS_SAVE_RECORD, null)
+                ApiResponse.success(ResponseCode.SUCCESS_SAVE_RECORD, studyRecordId)
         );
     }
 
-    @Operation(summary = "원형 그래프 조회", description = "원형 그래프를 recordId와 tab값(study_time, pose, focus)으로 조회합니다.")
+    @Operation(summary = "원형 그래프 조회", description = "원형 그래프를 studyRecordId와 tab값(study_time, pose, focus)으로 조회합니다.")
     @GetMapping("/{studyRecordId}/pie-chart")
     public ResponseEntity<ApiResponse<List<PieChartItem>>> getPieChart(
             @PathVariable Long studyRecordId,

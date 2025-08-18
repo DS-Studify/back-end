@@ -92,7 +92,7 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public void saveLogs(String email, SaveRecordRequest request) {
+    public Long saveLogs(String email, SaveRecordRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
         // 시간 계산
@@ -168,7 +168,9 @@ public class RecordServiceImpl implements RecordService {
 
         logs.forEach(log -> log.setStudyRecord(record));
         record.getTimeStampLogs().addAll(logs);
-        studyRecordRepository.save(record);
+        StudyRecord saved = studyRecordRepository.save(record);
+
+        return saved.getId();
     }
 
     @Override
