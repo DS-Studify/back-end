@@ -51,12 +51,16 @@ public class StatisticsServiceImpl implements StatisticsService{
                 calendar
         );
     }
-        // 해당 날짜에 대한 상세 정보
-        List<StudyRecord> targetRecords = monthlyRecords.stream()
-                .filter(r -> r.getDate().equals(date))
-                .toList();
+    @Override
+    public DailyDetail getCalendarDaily(String email, LocalDate date) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        Long userId = user.getId();
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        // 해당 날짜에 대한 상세 정보
+        List<StudyRecord> targetRecords = studyRecordRepository.findByUserIdAndDate(userId, date);
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         int totalStudyTime = targetRecords.stream().mapToInt(StudyRecord::getStudyTime).sum();
         int totalFocusTime = targetRecords.stream().mapToInt(StudyRecord::getFocusTime).sum();
@@ -69,19 +73,13 @@ public class StatisticsServiceImpl implements StatisticsService{
                 ))
                 .collect(Collectors.toList());
 
-        DailyDetail detail = new DailyDetail(
+        return new DailyDetail(
                 formatKoreanShortDate(date),
                 totalStudyTime,
                 totalFocusTime,
                 timeRanges
         );
 
-        return new CalendarResponse(
-                yearMonth.getYear(),
-                yearMonth.getMonthValue(),
-                calendar,
-                detail
-        );
     }
     private String formatKoreanShortDate(LocalDate date) {
         return date.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN));

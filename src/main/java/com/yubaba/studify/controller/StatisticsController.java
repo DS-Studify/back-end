@@ -34,11 +34,14 @@ public class StatisticsController {
         );
     }
 
+    @Operation(summary = "통계 달력 특정 일자 상세 조회", description = "통계 달력 정보를 조회합니다.")
+    @GetMapping("/calendar/daily")
+    public ResponseEntity<ApiResponse<DailyDetail>> getCalendarDaily(
             @AuthenticationPrincipal String email, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        CalendarResponse dto = statisticsService.getCalendarData(email, date);
+        DailyDetail dto = statisticsService.getCalendarDaily(email, date);
         return ResponseEntity.ok(
-                ApiResponse.success(ResponseCode.SUCCESS_STATISTICS_CALENDAR, dto)
+                ApiResponse.success(ResponseCode.SUCCESS_STATISTICS_CALENDAR_DAILY, dto)
         );
     }
 }
