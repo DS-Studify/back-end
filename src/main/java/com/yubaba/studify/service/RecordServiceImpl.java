@@ -32,7 +32,7 @@ public class RecordServiceImpl implements RecordService {
     private final ObjectMapper mapper;
 
     @Override
-    public RecordResponse getFeedbackDetail(Long recordId, String tab) {
+    public RecordResponse getFeedbackDetail(Long recordId) {
         StudyRecord record = studyRecordRepository.findById(recordId)
                 .orElseThrow(() -> new RuntimeException("StudyRecord not found"));
 
@@ -47,51 +47,6 @@ public class RecordServiceImpl implements RecordService {
                                 Collectors.toList()
                         )
                 ));
-
-        PieChart pieChart;
-
-        switch (tab) {
-            case "study_time" -> {
-                int study = record.getStudyTime();
-                int sleep = record.getSleepTime();
-                int away = record.getAwayTime();
-                int etc = record.getEtcTime();
-                int total = study + sleep + away + etc;
-                int ratioStudy = getRatio(study, total);
-                int ratioSleep = getRatio(sleep, total);
-                int ratioAway = getRatio(away, total);
-                int ratioEtc = getRatio(etc, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("공부", ratioStudy, study),
-                        new PieChartItem("졸음", ratioSleep, sleep),
-                        new PieChartItem("자리비움", ratioAway, away),
-                        new PieChartItem("기타", ratioEtc, etc)
-                ));
-            }
-            case "focus" -> {
-                int focus = record.getFocusTime();
-                int nfocus = record.getNfocusTime();
-                int total = focus + nfocus;
-                int ratioFocus = getRatio(focus, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("집중", ratioFocus, focus),
-                        new PieChartItem("비집중", 100 - ratioFocus, nfocus)
-                ));
-            }
-            case "pose" -> {
-                int pose = record.getPoseTime();
-                int npose = record.getNposeTime();
-                int total = pose + npose;
-                int ratioPose = getRatio(pose, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("바른 자세", ratioPose, pose),
-                        new PieChartItem("나쁜 자세", 100 - ratioPose, npose)
-                ));
-            }
-            default -> {
-                pieChart = new PieChart(List.of());
-            }
-        }
 
         return RecordResponse.builder()
                 .studyRecordId(record.getId())
@@ -99,15 +54,13 @@ public class RecordServiceImpl implements RecordService {
                 .startTime(String.valueOf(record.getStartTime()))
                 .endTime(String.valueOf(record.getEndTime()))
                 .actualStudyTime(String.valueOf(record.getStudyTime()))
-                .tab(tab)
-                .pieChartRatio(pieChart)
                 .timeLog(timeLogMap)
                 .aiFeedback(record.getFeedback())
                 .build();
     }
 
     @Override
-    public AnalysisResponse getAnalysisResult(Long recordId, String tab) {
+    public AnalysisResponse getAnalysisResult(Long recordId) {
         StudyRecord record = studyRecordRepository.findById(recordId)
                 .orElseThrow(() -> new RuntimeException("StudyRecord not found"));
 
@@ -123,51 +76,6 @@ public class RecordServiceImpl implements RecordService {
                         )
                 ));
 
-        PieChart pieChart;
-
-        switch (tab) {
-            case "study_time" -> {
-                int study = record.getStudyTime();
-                int sleep = record.getSleepTime();
-                int away = record.getAwayTime();
-                int etc = record.getEtcTime();
-                int total = study + sleep + away + etc;
-                int ratioStudy = getRatio(study, total);
-                int ratioSleep = getRatio(sleep, total);
-                int ratioAway = getRatio(away, total);
-                int ratioEtc = getRatio(etc, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("공부", ratioStudy, study),
-                        new PieChartItem("졸음", ratioSleep, sleep),
-                        new PieChartItem("자리비움", ratioAway, away),
-                        new PieChartItem("기타", ratioEtc, etc)
-                ));
-            }
-            case "focus" -> {
-                int focus = record.getFocusTime();
-                int nfocus = record.getNfocusTime();
-                int total = focus + nfocus;
-                int ratioFocus = getRatio(focus, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("집중", ratioFocus, focus),
-                        new PieChartItem("비집중", 100 - ratioFocus, nfocus)
-                ));
-            }
-            case "pose" -> {
-                int pose = record.getPoseTime();
-                int npose = record.getNposeTime();
-                int total = pose + npose;
-                int ratioPose = getRatio(pose, total);
-                pieChart = new PieChart(List.of(
-                        new PieChartItem("바른 자세", ratioPose, pose),
-                        new PieChartItem("나쁜 자세", 100 - ratioPose, npose)
-                ));
-            }
-            default -> {
-                pieChart = new PieChart(List.of());
-            }
-        }
-        
         int recordRatio = (int) (((double) record.getStudyTime() / record.getRecordTime()) * 100);
 
         return AnalysisResponse.builder()
@@ -178,8 +86,6 @@ public class RecordServiceImpl implements RecordService {
                 .recordTime(String.valueOf(record.getRecordTime()))
                 .recordRatio(recordRatio)
                 .actualStudyTime(String.valueOf(record.getStudyTime()))
-                .tab(tab)
-                .pieChartRatio(pieChart)
                 .timeLog(timeLogMap)
                 .aiFeedback(record.getFeedback())
                 .build();
@@ -263,6 +169,55 @@ public class RecordServiceImpl implements RecordService {
         logs.forEach(log -> log.setStudyRecord(record));
         record.getTimeStampLogs().addAll(logs);
         studyRecordRepository.save(record);
+    }
+
+    @Override
+    public List<PieChartItem> getPieChart(Long recordId, String tab) {
+        StudyRecord record = studyRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RuntimeException("StudyRecord not found"));
+
+        switch (tab) {
+            case "study_time" -> {
+                int study = record.getStudyTime();
+                int sleep = record.getSleepTime();
+                int away = record.getAwayTime();
+                int etc = record.getEtcTime();
+                int total = study + sleep + away + etc;
+                int ratioStudy = getRatio(study, total);
+                int ratioSleep = getRatio(sleep, total);
+                int ratioAway = getRatio(away, total);
+                int ratioEtc = getRatio(etc, total);
+                return List.of(
+                        new PieChartItem("공부", ratioStudy, study),
+                        new PieChartItem("졸음", ratioSleep, sleep),
+                        new PieChartItem("자리비움", ratioAway, away),
+                        new PieChartItem("기타", ratioEtc, etc)
+                );
+            }
+            case "focus" -> {
+                int focus = record.getFocusTime();
+                int nfocus = record.getNfocusTime();
+                int total = focus + nfocus;
+                int ratioFocus = getRatio(focus, total);
+                return List.of(
+                        new PieChartItem("집중", ratioFocus, focus),
+                        new PieChartItem("비집중", 100 - ratioFocus, nfocus)
+                );
+            }
+            case "pose" -> {
+                int pose = record.getPoseTime();
+                int npose = record.getNposeTime();
+                int total = pose + npose;
+                int ratioPose = getRatio(pose, total);
+                return List.of(
+                        new PieChartItem("바른 자세", ratioPose, pose),
+                        new PieChartItem("나쁜 자세", 100 - ratioPose, npose)
+                );
+            }
+            default -> {
+                return List.of();
+            }
+        }
     }
 
 

@@ -20,8 +20,6 @@ public class AnalysisResponse {
     private String recordTime;
     private int recordRatio;
     private String actualStudyTime;
-    private String tab;
-    private PieChart pieChartRatio;
     private Map<String, List<RecordTimeLog>> timeLog;
     private String aiFeedback;
 }

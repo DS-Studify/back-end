@@ -28,6 +28,7 @@ public enum ResponseCode {
     SUCCESS_HOME(200, "SUCCESS_HOME", "홈화면 조회에 성공했습니다."),
     SUCCESS_SAVE_RECORD(200, "SUCCES_SAVE_RECORD", "공부 기록 저장에 성공했습니다."),
     SUCCESS_ANALYSIS_RESULT(200, "SUCCESS_ANALYSIS_RESULT", "공부 분석 결과 조회에 성공했습니다."),
+    SUCCESS_PIE_CHART(200, "SUCCESS_PIE_CHART", "원형 그래프 조회에 성공했습니다."),
     SUCCESS_FEEDBACK_DETAIL(200, "SUCCESS_FEEDBACK_DETAIL", "피드백 상세 조회에 성공했습니다."),
     SUCCESS_STATISTICS_CALENDAR(200, "SUCCESS_STATISTICS_CALENDAR", "통계 달력 조회에 성공했습니다."),
 
