@@ -25,12 +25,10 @@ public class StatisticsServiceImpl implements StatisticsService{
     private final UserRepository userRepository;
 
     @Override
-    public CalendarResponse getCalendarData(String email, LocalDate date) {
+    public CalendarResponse getCalendarMonthly(String email, YearMonth yearMonth) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
         Long userId = user.getId();
-
-        YearMonth yearMonth = YearMonth.from(date);
 
         // 월간 전체 StudyRecord
         List<StudyRecord> monthlyRecords = studyRecordRepository
@@ -47,6 +45,12 @@ public class StatisticsServiceImpl implements StatisticsService{
                 .map(entry -> new CalendarSummary(entry.getKey(), entry.getValue()))
                 .toList();
 
+        return new CalendarResponse(
+                yearMonth.getYear(),
+                yearMonth.getMonthValue(),
+                calendar
+        );
+    }
         // 해당 날짜에 대한 상세 정보
         List<StudyRecord> targetRecords = monthlyRecords.stream()
                 .filter(r -> r.getDate().equals(date))

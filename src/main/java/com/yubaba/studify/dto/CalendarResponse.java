@@ -15,5 +15,4 @@ public class CalendarResponse {
     private int year;
     private int month;
     private List<CalendarSummary> calendar;
-    private DailyDetail detail;
 }
