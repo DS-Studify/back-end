@@ -193,7 +193,7 @@ public class RecordServiceImpl implements RecordService {
                         new PieChartItem("공부", ratioStudy, study),
                         new PieChartItem("졸음", ratioSleep, sleep),
                         new PieChartItem("자리비움", ratioAway, away),
-                        new PieChartItem("기타", ratioEtc, etc)
+                        new PieChartItem("공부 중지", ratioEtc, etc)
                 );
             }
             case "focus" -> {
