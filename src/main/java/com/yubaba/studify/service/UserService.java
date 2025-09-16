@@ -11,4 +11,5 @@ public interface UserService {
 
     ProfileResponse changeNickname(String email, String newNickname);
 
+    void deleteUserByEmail(String email);
 }
