@@ -26,10 +26,10 @@ public class AuthController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody SignupRequest singupReq) {
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody SignupRequest singupReq) {
         try {
             authService.register(singupReq);
-            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_REGISTER, null));
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_REGISTER, singupReq.getEmail()));
         } catch (IllegalArgumentException e) {
             if ("EMAIL_NOT_VERIFIED".equals(e.getMessage())) {
                 return ResponseEntity.badRequest().body(ApiResponse.error(ResponseCode.EMAIL_NOT_VERIFIED));
@@ -100,10 +100,10 @@ public class AuthController {
 
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RequestBody LogoutRequest request) {
+    public ResponseEntity<ApiResponse<String>> logout(@RequestBody LogoutRequest request) {
         try {
             authService.logout(request.getRefreshToken());
-            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_LOGOUT, null));
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_LOGOUT, ""));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(ResponseCode.INVALID_REFRESH_TOKEN));

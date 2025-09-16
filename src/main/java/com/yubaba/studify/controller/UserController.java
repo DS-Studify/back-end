@@ -9,6 +9,7 @@ import com.yubaba.studify.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,35 +27,20 @@ public class UserController {
     public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(@AuthenticationPrincipal String email) {
         ProfileResponse response = userService.getProfile(email);
 
-        return ResponseEntity.ok(ApiResponse.<ProfileResponse>builder()
-                .status(ResponseCode.SUCCESS_PROFILE.getStatus())
-                .code(ResponseCode.SUCCESS_PROFILE.getCode())
-                .message(ResponseCode.SUCCESS_PROFILE.getMessage())
-                .data(response)
-                .build());
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_PROFILE, response));
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호를 변경합니다.")
     @PatchMapping("/change-password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<ApiResponse<String>> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangePasswordRequest request) {
 
         try {
             userService.changePassword(email, request.getOriginPassword(), request.getNewPassword());
 
-            return ResponseEntity.ok(ApiResponse.<Void>builder()
-                    .status(ResponseCode.SUCCESS_CHANGE_PASSWORD.getStatus())
-                    .code(ResponseCode.SUCCESS_CHANGE_PASSWORD.getCode())
-                    .message(ResponseCode.SUCCESS_CHANGE_PASSWORD.getMessage())
-                    .data(null)
-                    .build());
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_CHANGE_PASSWORD, email));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(ResponseCode.INCORRECT_PASSWORD.getStatus())
-                    .body(ApiResponse.<Void>builder()
-                            .status(ResponseCode.INCORRECT_PASSWORD.getStatus())
-                            .code(ResponseCode.INCORRECT_PASSWORD.getCode())
-                            .message(ResponseCode.INVALID_EMAIL_FORMAT.getMessage())
-                            .data(null)
-                            .build());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(ResponseCode.INCORRECT_PASSWORD));
         }
     }
 
@@ -64,33 +50,18 @@ public class UserController {
 
         ProfileResponse response = userService.changeNickname(email, request.getNewNickname());
 
-        return ResponseEntity.ok(ApiResponse.<ProfileResponse>builder()
-                .status(ResponseCode.SUCCESS_CHANGE_NICKNAME.getStatus())
-                .code(ResponseCode.SUCCESS_CHANGE_NICKNAME.getCode())
-                .message(ResponseCode.SUCCESS_CHANGE_NICKNAME.getMessage())
-                .data(response)
-                .build());
+        return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_CHANGE_NICKNAME, response));
     }
 
     @Operation(summary = "회원 탈퇴")
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal String email) {
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal String email) {
         try {
             userService.deleteUserByEmail(email);
-            return ResponseEntity.ok(ApiResponse.<Void>builder()
-                    .status(ResponseCode.SUCCESS_DELETE_USER.getStatus())
-                    .code(ResponseCode.SUCCESS_DELETE_USER.getCode())
-                    .message(ResponseCode.SUCCESS_DELETE_USER.getMessage())
-                    .data(null)
-                    .build());
+            return ResponseEntity.ok(ApiResponse.success(ResponseCode.SUCCESS_DELETE_USER, email));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(ResponseCode.USER_NOT_FOUND.getStatus())
-                    .body(ApiResponse.<Void>builder()
-                            .status(ResponseCode.USER_NOT_FOUND.getStatus())
-                            .code(ResponseCode.USER_NOT_FOUND.getCode())
-                            .message(ResponseCode.USER_NOT_FOUND.getMessage())
-                            .data(null)
-                            .build());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(ResponseCode.USER_NOT_FOUND, email));
         }
     }
 
