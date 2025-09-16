@@ -19,6 +19,8 @@ public enum ResponseCode {
     INVALID_REFRESH_TOKEN(401, "INVALID_REFRESH_TOKEN", "Refresh Token이 유효하지 않거나 만료되었습니다."),
     SUCCESS_TOKEN_REFRESH(200, "SUCCESS_TOKEN_REFRESH", "Access Token이 재발급되었습니다."),
     SUCCESS_LOGOUT(200, "SUCCESS_LOGOUT", "로그아웃에 성공했습니다."),
+    SUCCESS_DELETE_USER(200, "SUCCESS_DELETE_USER", "회원 탈퇴에 성공했습니다."),
+    USER_NOT_FOUND(404, "USER_NOT_FOUND", "존재하지 않는 사용자입니다."),
 
     SUCCESS_PROFILE(200, "SUCCESS_PROFILE", "프로필 조회에 성공했습니다."),
     SUCCESS_CHANGE_PASSWORD(200, "SUCCESS_CHANGE_PASSWORD", "비밀번호를 변경했습니다."),

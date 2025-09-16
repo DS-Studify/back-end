@@ -72,4 +72,26 @@ public class UserController {
                 .build());
     }
 
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal String email) {
+        try {
+            userService.deleteUserByEmail(email);
+            return ResponseEntity.ok(ApiResponse.<Void>builder()
+                    .status(ResponseCode.SUCCESS_DELETE_USER.getStatus())
+                    .code(ResponseCode.SUCCESS_DELETE_USER.getCode())
+                    .message(ResponseCode.SUCCESS_DELETE_USER.getMessage())
+                    .data(null)
+                    .build());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(ResponseCode.USER_NOT_FOUND.getStatus())
+                    .body(ApiResponse.<Void>builder()
+                            .status(ResponseCode.USER_NOT_FOUND.getStatus())
+                            .code(ResponseCode.USER_NOT_FOUND.getCode())
+                            .message(ResponseCode.USER_NOT_FOUND.getMessage())
+                            .data(null)
+                            .build());
+        }
+    }
+
 }

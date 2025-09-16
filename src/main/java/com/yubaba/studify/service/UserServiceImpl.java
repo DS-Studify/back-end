@@ -13,6 +13,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
     @Override
     public ProfileResponse getProfile(String email) {
@@ -44,6 +45,15 @@ public class UserServiceImpl implements UserService {
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+    }
+
+    @Override
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
+
+        userRepository.delete(user);
+        redisService.deleteRefreshToken(user.getEmail());
     }
 
 }
