@@ -64,10 +64,10 @@ public class ChatGptService {
         String dataString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(studyResult);
 
         String prompt = """
-            다음은 한 학생의 공부 상태별 시간 기록입니다.
+            다음은 한 학생의 공부 상태별 누적 시간(초) 데이터입니다.
             
             상태 목록:
-            1. 공부 중 = 공부한 시간 = 2.바른 자세 + 3.집중 안 되는 자세
+            1. 공부 중 = 실제 공부한 시간 (2.바른 자세 + 3.집중 안 되는 자세 포함)
             2. 바른 자세 = 올바른 자세로 공부한 시간
             3. 집중 안 되는 자세 = 산만하거나 흐트러진 자세
             4. 졸음 자세 = 졸고 있는 자세

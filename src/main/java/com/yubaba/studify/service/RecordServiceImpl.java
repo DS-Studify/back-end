@@ -2,6 +2,7 @@ package com.yubaba.studify.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yubaba.studify.dto.*;
 import com.yubaba.studify.entity.StudyRecord;
 import com.yubaba.studify.entity.StudyState;
@@ -127,22 +128,18 @@ public class RecordServiceImpl implements RecordService {
 
         nposeTime = nfocusTime + sleepTime;
 
-
-        // AI 피드백 요청 데이터 구성: timeLog 형태
-        Map<String, List<RecordTimeLog>> timeLogMap = logs.stream()
-                .collect(Collectors.groupingBy(
-                        log -> String.valueOf(getStateCode(log.getState())),
-                        Collectors.mapping(
-                                log -> new RecordTimeLog(log.getStartTime(), log.getEndTime()),
-                                Collectors.toList()
-                        )
-                ));
+        // 요약 데이터 JSON으로 구성
+        ObjectNode studyResult = mapper.createObjectNode();
+        studyResult.put("공부 중 (STUDYING)", studyTime);
+        studyResult.put("바른 자세 (GOOD_POSE)", poseTime);
+        studyResult.put("집중 안 되는 자세 (NFOCUS_POSE)", nfocusTime);
+        studyResult.put("졸음 자세 (SLEEP_POSE)", sleepTime);
+        studyResult.put("자리비움 (AWAY)", awayTime);
+        studyResult.put("공부 중지 (ETC)", etcTime);
 
         String aiFeedback;
         try {
-            // timeLogMap을 JSON으로 변환해서 전달
-            JsonNode timeLogJson = mapper.valueToTree(timeLogMap);
-            aiFeedback = chatGptService.getFeedback(timeLogJson);
+            aiFeedback = chatGptService.getFeedback(studyResult);
         } catch (Exception e) {
             e.printStackTrace();
             aiFeedback = "AI 피드백 생성 중 오류가 발생했습니다.";
